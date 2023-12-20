@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html id="test-html">
+  <head>
+    <title>截图测试页面</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body id="body">
+    <style>
+      body {
+        font-size: larger;
+      }
+      nav {
+        background-color: #ccc;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      li {
+        flex-shrink: 0;
+        margin-right: 20px;
+        color: darkgreen;
+      }
+      a {
+        color: blue;
+      }
+      img {
+        width: 100px;
+        /* height: 175px; */
+      }
+    </style>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">首页</a></li>
+          <li><a href="#">热门搜索</a></li>
+          <li><a href="#">推荐搜索</a></li>
+          <li><a href="#">我的搜索</a></li>
+          <li><a href="#">设置</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h1>截图测试页面，图片测试</h1>
+        <img
+          src="https://front-static.ab-inbev.cn/bees/20230222/authentication2x.png"
+        />
+      </article>
+      <footer>
+        <button id="myButton" onclick="postScreenshot('inner')">
+          截图当前页面
+        </button>
+        <button id="myButton2" onclick="postScreenshot('outer')">
+          截图h5链接
+        </button>
+        <button id="myButton2" onclick="postScreenshot('ejs')">
+          截图ejs模板
+        </button>
+      </footer>
+    </main>
+  </body>
+  <script>
+    let id = 1;
+
+    const template = `
+      <style>
+        li {
+          margin: 20px;
+        }
+      </style>
+      <link rel="stylesheet" href="./index.css">
+      <ul>
+        <% users.forEach(user => { %>
+          <li style="background-color: red;"><%= user.name %> (age <%= user.age %>)</li>
+        <% }) %>
+      </ul>
+    `;
+    const data = {
+      users: [
+        { name: 'Alice', age: 25 },
+        { name: 'Bob', age: 30 },
+        { name: 'Charlie', age: 35 },
+      ],
+    };
+
+    function postScreenshot(type) {
+      id++;
+      console.log('type', type);
+      const el = document.getElementById('body');
+      var myElementString = new XMLSerializer().serializeToString(el); // el.innerHTML;
+      fetch('http://127.0.0.1:9000/screen2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: type === 'inner' ? myElementString : '',
+          url: type === 'outer' ? 'https://www.baidu.com/' : '',
+          template: type === 'ejs' ? template : '',
+          data: type === 'ejs' ? data : '',
+          options: {
+            width: 375,
+            height: 300,
+          },
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('请求成功！');
+          console.log(data);
+        })
+        .catch(error => {
+          console.error('请求失败！', error);
+        });
+    }
+  </script>
+</html>
