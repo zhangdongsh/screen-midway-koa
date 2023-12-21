@@ -89,8 +89,11 @@
       id++;
       console.log('type', type);
       const el = document.getElementById('body');
-      var myElementString = new XMLSerializer().serializeToString(el); // el.innerHTML;
-      fetch('http://127.0.0.1:9000/screen2', {
+      const myElementString = new XMLSerializer().serializeToString(el); // el.innerHTML;
+      const domainDev = 'http://127.0.0.1:9000/';
+      const domain =
+        'https://screen-koa-node-lnnuhdgezs.cn-hangzhou.fcapp.run/';
+      fetch(`${domainDev}api/screenshot2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,10 +111,12 @@
       })
         .then(response => response.json())
         .then(data => {
+          alert(JSON.stringify(data));
           console.log('请求成功！');
           console.log(data);
         })
         .catch(error => {
+          alert(JSON.stringify(data));
           console.error('请求失败！', error);
         });
     }
