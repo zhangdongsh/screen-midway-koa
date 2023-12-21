@@ -29,7 +29,7 @@ const getScreenshot2 = async ({
     const browser = await puppeteer.launch({
       headless: 'new',
       args: [
-        '--disable-gpu',
+        // '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
         '--no-first-run',
@@ -41,7 +41,7 @@ const getScreenshot2 = async ({
     logger.log(`浏览器创建耗时：${launchEnd - launchStart}ms`);
     // 设置页面尺寸、内容
     const page = await browser.newPage();
-    await page.emulateTimezone('Asia/Shanghai');
+    // await page.emulateTimezone('Asia/Shanghai');
     // 默认iphoneX尺寸
     page.setViewport({
       width: 375,

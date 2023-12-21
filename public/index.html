@@ -77,7 +77,7 @@
         <% }) %>
       </ul>
     `;
-    const data = {
+    const templateData = {
       users: [
         { name: 'Alice', age: 25 },
         { name: 'Bob', age: 30 },
@@ -90,10 +90,10 @@
       console.log('type', type);
       const el = document.getElementById('body');
       const myElementString = new XMLSerializer().serializeToString(el); // el.innerHTML;
-      const domainDev = 'http://127.0.0.1:9000/';
-      const domain =
-        'https://screen-koa-node-lnnuhdgezs.cn-hangzhou.fcapp.run/';
-      fetch(`${domainDev}api/screenshot2`, {
+      // const domainDev = 'http://127.0.0.1:9000/';
+      // const domainProd =
+      //   'https://screen-koa-node-lnnuhdgezs.cn-hangzhou.fcapp.run/';
+      fetch(`${domainProd}:9000/api/screenshot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,10 +102,13 @@
           html: type === 'inner' ? myElementString : '',
           url: type === 'outer' ? 'https://www.baidu.com/' : '',
           template: type === 'ejs' ? template : '',
-          data: type === 'ejs' ? data : '',
-          options: {
+          templateData: type === 'ejs' ? templateData : '',
+          viewportOptions: {
             width: 375,
             height: 300,
+          },
+          screenshotOptions: {
+            fullPage: true,
           },
         }),
       })

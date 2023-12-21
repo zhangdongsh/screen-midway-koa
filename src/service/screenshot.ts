@@ -5,6 +5,7 @@ const ejs = require('ejs');
 const puppeteer = require('puppeteer');
 const genericPool = require('generic-pool');
 const crypto = require('crypto');
+import { IScreenshotReq } from '../interface';
 import { formatRes, uploadOss } from '../utils/index';
 
 const imgPath = path.join(__dirname, '../../public/img');
@@ -102,14 +103,16 @@ const pool = createPuppeteerPool({
 });
 
 const getScreenshot = async ({
-  logger = console,
   url,
   html = '',
   template = '',
-  data = {},
-  options = {},
-}) => {
+  templateData = {},
+  viewportOptions,
+  screenshotOptions,
+}: IScreenshotReq) => {
   return pool.use(async browser => {
+    // 方便切换为 midway 日志模块
+    const logger = console;
     try {
       const start = new Date().getTime();
       if (!html && !url && !template)
@@ -121,15 +124,15 @@ const getScreenshot = async ({
       await fse.ensureDir(imgPath);
       // 设置页面尺寸、内容
       const page = await browser.newPage();
-      await page.emulateTimezone('Asia/Shanghai');
+      // await page.emulateTimezone('Asia/Shanghai');
       // 默认iphoneX尺寸
       page.setViewport({
         width: 375,
         height: 812,
-        ...options,
+        ...viewportOptions,
       });
       if (template) {
-        html = ejs.render(template, data);
+        html = ejs.render(template, templateData);
         logger.log('1、设置页面尺寸、内容-开始，type: template');
       } else {
         logger.log(
@@ -151,8 +154,8 @@ const getScreenshot = async ({
       )}-${hashedData}.png`;
       const currentImageFullPath = `${imgPath}/${currentImageFileName}`;
       await page.screenshot({
+        ...screenshotOptions,
         path: currentImageFullPath,
-        fullPage: true,
       });
 
       logger.log('4、截图成功，关闭页面');
@@ -164,7 +167,7 @@ const getScreenshot = async ({
         currentImageFullPath,
         logger
       );
-      fse.remove(currentImageFullPath);
+      // fse.remove(currentImageFullPath);
       const end = new Date().getTime();
       logger.log(`6、上传oss成功，总耗时：${end - start}ms，oss res: ${res}`);
       logger.log(`================end-${hashedData}================`);
